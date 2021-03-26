@@ -1,0 +1,50 @@
+const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const HTMLWebpackPlugin = require('html-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+
+let _mode = 'development';
+let _target = 'web';
+let _devtool = 'source-map';
+
+if (process.env.NODE_ENV === 'production') {
+  _mode = 'production';
+  _target = 'browserslist';
+  _devtool = 'eval';
+}
+
+module.exports = {
+  mode: _mode,
+  target: _target,
+  devtool: _devtool,
+  devServer: {
+    contentBase: './dist',
+    hot: true,
+  },
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    assetModuleFilename: 'assets/[name][ext][query]',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.(png|gpe?g|gif|svg)$/i,
+        type: 'asset/resource',
+      },
+      {
+        test: /\.(s[ac]|c)ss$/i,
+        use: [
+          { loader: MiniCssExtractPlugin.loader, options: { publicPath: '' } },
+          'css-loader',
+          'postcss-loader',
+          'sass-loader',
+        ],
+      },
+    ],
+  },
+  plugins: [
+    new CleanWebpackPlugin(),
+    new MiniCssExtractPlugin(),
+    new HTMLWebpackPlugin({ template: './src/index.html' }),
+  ],
+};
